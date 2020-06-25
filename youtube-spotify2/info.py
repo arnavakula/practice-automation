@@ -1,0 +1,2 @@
+spotify_id = 'arnavakula'
+spotify_oauth = 'BQA3aAylwKkufKk_-O5Ekyp5GQ39rRje0C30vbigb9cQI_a5ESIrzvGnTUwxZoe2hisZnWfzPOAk7xO4Tsk4Js1yR5H53tH2AXa9GmUA3Gyef4RoOZ_wNmAbrwSfNxGnwvLJGTUuFlHQr_OlGfQnUe5BJn0KUXBQauaQIozPlcGlgzDw1uO4Ud8Xel5sKIRU-eX3kVtoDwWsHngo'
