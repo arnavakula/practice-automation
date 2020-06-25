@@ -1,7 +1,7 @@
 import os
 
 import google_auth_oauthlib
-import googleapiclient 
+import googleapiclient.discovery 
 import youtube_dl
 
 class Playlist(object):
