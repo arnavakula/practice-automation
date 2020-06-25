@@ -31,11 +31,12 @@ class MainApp():
 
         api_service_name = "youtube"
         api_version = "v3"
-        client_secrets_file = "client_secret.json"
+        client_secrets_file = "client_secrets.json"
 
         flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
         client_secrets_file, scopes)
-        credentials = flow.run_console()
+        
+        credentials = flow.run_local_server()
 
         youtube_client = googleapiclient.discovery.build(
         api_service_name, api_version, credentials=credentials)
@@ -43,7 +44,14 @@ class MainApp():
         return youtube_client
 
     def get_liked_songs(self):
-        pass
+        request = self.youtube_client.videos().list(
+            part = 'snippet, contentDetails, statistics',
+            myRating = 'like'
+        )
+
+        response = request.execute()
+
+        print(response.keys())
 
     def get_playlist_id(self):
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
@@ -120,6 +128,7 @@ class MainApp():
 
 
 app = MainApp()
+app.get_liked_songs()
 # app.get_playlist_id()
 # song_id = app.get_song_id('drake', 'jumpman')
 # app.add_song(song_id)
