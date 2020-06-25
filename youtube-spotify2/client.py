@@ -24,9 +24,6 @@ class MainApp():
     def get_liked_songs(self):
         pass
 
-    def search_spotify(self):
-        pass
-
     def create_playlist(self):
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
@@ -36,8 +33,6 @@ class MainApp():
             'public': False
         })
 
-        print('got here')
-
         response = requests.post(
             url, 
             data = request_body,
@@ -46,9 +41,45 @@ class MainApp():
                 'Authorization': 'Bearer {}'.format(self.oauth)
             }
         )
+    
+    def search_spotify(self, artist, name):
+        search_url = 'https://api.spotify.com/v1/search?q={}%20{}&type=track'.format(artist, name)
+
+        response = requests.get(
+            search_url,
+            headers = {
+                'Content-Type': 'applications/json',
+                'Authorization': 'Bearer {}'.format(self.oauth)
+            }
+        )
+
+        response_json = response.json()
+
+
+        return response_json['tracks']['items'][0]['id']
+
+
+    def add_song(self, playlist_id = '11StXAlX9HSeUwDBuBj8xs', song_id = '4wVOKKEHUJxHCFFNUWDn0B?si=opGFD9Z9Qn2OuttMLE9nWw'):
+        url = 'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id)
+
+        query = json.dumps({
+            'uris': 'spotify:track:{}'.format(song_id)
+        })
+
+        response = requests.post(
+            url, 
+            data = query,
+            headers = {
+                'Content-Type': 'applications/json',
+                'Authorization': 'Bearer {}'.format(self.oauth)
+            }
+        )
+
+        
+
+
 
 app = MainApp()
-
-app.create_playlist()
+print(app.search_spotify('drake', 'jumpman'))
 
 
