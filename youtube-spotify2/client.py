@@ -17,6 +17,7 @@ class MainApp():
     def __init__(self):
         self.user_id = info.spotify_id
         self.oauth = info.spotify_oauth
+        self.playlist_name = info.spotify_playlist
 
     def get_youtube_client(self):
         pass
@@ -27,22 +28,32 @@ class MainApp():
     def create_playlist(self):
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
-        request_body = json.dumps({
-            'name': 'Liked songs',
-            'description': 'Automated from Youtube',
-            'public': False
-        })
-
-        response = requests.post(
+        response = requests.get(
             url, 
-            data = request_body,
             headers = {
-                'Content-Type': 'applications/json',
                 'Authorization': 'Bearer {}'.format(self.oauth)
             }
         )
+
+        playlists = [playlist['name'] for playlist in response.json()['items']]
+
+        if not self.playlist_name in playlists:
+            request_body = json.dumps({
+                'name': '{}'.format(playlist_name),
+                'description': 'Automated from Youtube',
+                'public': False
+            })
+
+            response = requests.post(
+                url, 
+                data = request_body,
+                headers = {
+                    'Content-Type': 'applications/json',
+                    'Authorization': 'Bearer {}'.format(self.oauth)
+                }
+            )
     
-    def search_spotify(self, artist, name):
+    def get_spotify_id(self, artist, name):
         search_url = 'https://api.spotify.com/v1/search?q={}%20{}&type=track'.format(artist, name)
 
         response = requests.get(
@@ -54,7 +65,6 @@ class MainApp():
         )
 
         response_json = response.json()
-
 
         return response_json['tracks']['items'][0]['id']
 
@@ -80,6 +90,5 @@ class MainApp():
 
 
 app = MainApp()
-print(app.search_spotify('drake', 'jumpman'))
-
+app.create_playlist()
 
