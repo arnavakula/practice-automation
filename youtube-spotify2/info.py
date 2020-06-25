@@ -1,3 +1,2 @@
 spotify_id = 'arnavakula'
 spotify_playlist = 'Liked videos'
-spotify_oauth = 'BQDag_wy3Gd9JFqU2uSVg2z1qraYeCGTjxyCbmK6UNdqkyKLS4sxrmLJw01JVF8q_lOCSlErZimw-uSzizXAFBTuJO_vxi9qnCA6kWgGbWfzb15qh6oEEofMvC2Po0-SORVTSpA90sXrA4S2U_KxPo51yD7hSsTo9GzRwuD3wGOfb1fWalPjbE2ZL16yQEcDoZRy2WLrc-0OT-ep8zcrnG0FsbTIdnww'
