@@ -16,6 +16,7 @@ import os
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
+import youtube_dl
 
 class MainApp():
 
@@ -43,15 +44,21 @@ class MainApp():
 
         return youtube_client
 
-    def get_liked_songs(self):
+    def get_liked_songs_ids(self):
         request = self.youtube_client.videos().list(
             part = 'snippet, contentDetails, statistics',
             myRating = 'like'
         )
 
         response = request.execute()
-
-        print(response.keys())
+        
+        lst = []
+        for item in response['items']:
+            artist = item['snippet']['title'].split(' - ')[0]
+            track = item['snippet']['title'].split(' - ')[1].split(' (')[0]
+            lst.append({'artist': artist, 'track': track})
+        
+        return(lst)
 
     def get_playlist_id(self):
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
@@ -122,13 +129,9 @@ class MainApp():
         )
    
             
-       
-        
-
-
-
+    
 app = MainApp()
-app.get_liked_songs()
+print(app.get_liked_songs_ids())
 # app.get_playlist_id()
 # song_id = app.get_song_id('drake', 'jumpman')
 # app.add_song(song_id)
