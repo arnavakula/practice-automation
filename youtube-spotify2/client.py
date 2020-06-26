@@ -25,7 +25,7 @@ class MainApp():
         self.oauth = info.spotify_oauth
         self.playlist_name = info.spotify_playlist
         self.song_info = {} #dict where values are a bio-dict
-        # self.youtube_client = self.get_youtube_client()
+        self.youtube_client = self.get_youtube_client()
 
     def get_youtube_client(self): # called
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -116,7 +116,7 @@ class MainApp():
 
         return pl_ids[pl_names.index(self.playlist_name)]
 
-    def get_song_id(self, artist, track):
+    def get_song_id(self, artist, track): # called
         search_url = 'https://api.spotify.com/v1/search?q={}%20{}&type=track'.format(artist, track)
 
         response = requests.get(
@@ -131,17 +131,15 @@ class MainApp():
     
         return response_json['tracks']['items'][0]['id']
 
-    def add_song(self):
+    def add_songs(self):
         url = 'https://api.spotify.com/v1/playlists/{}/tracks'.format(self.get_playlist_id())
 
-        #self.store_liked_songs()
-
-        song_info = {'Lil Mosey - Blueberry Faygo (Dir. by @_ColeBennett_)': {'url': 'https://www.youtube.com/watch?v=V_jHc_n0p9c', 'track': 'Blueberry Faygo', 'artist': 'Lil Mosey'}, '24kGoldn - Valentino (Official Music Video)': {'url': 'https://www.youtube.com/watch?v=trU-S53fK04', 'track': 'VALENTINO', 'artist': '24kGoldn'}, 'Roddy Ricch - High Fashion (feat. Mustard) [Official Audio]': {'url': 'https://www.youtube.com/watch?v=iGU66wsjIPA', 'track': 'High Fashion (feat. Mustard)', 'artist': 'Roddy Ricch'}}
+        self.store_liked_songs()
 
         song_uris = []
-        for song in song_info:
-            artist = song_info[song]['artist']
-            track = song_info[song]['track']
+        for song in self.song_info:
+            artist = self.song_info[song]['artist']
+            track = self.song_info[song]['track']
             song_uris.append('spotify:track:{}'.format(self.get_song_id(artist, track)))
         
         print(song_uris)
@@ -157,10 +155,7 @@ class MainApp():
             }
        )
 
-   
-app = MainApp()
 
-app.add_song()
-
-# lst = [{'artist': 'Lil Mosey', 'track': 'Blueberry Faygo'}, {'artist': '24kGoldn', 'track': 'Valentino'}, {'artist': 'Roddy Ricch', 'track': 'High Fashion'}]
-# print(lst[0]['artist'])
+def run():
+    app = MainApp()
+    app.add_songs()
