@@ -18,7 +18,6 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import youtube_dl
 
-
 class MainApp():
 
     def __init__(self):
@@ -26,7 +25,7 @@ class MainApp():
         self.oauth = info.spotify_oauth
         self.playlist_name = info.spotify_playlist
         self.song_info = {} #dict where values are a bio-dict
-        self.youtube_client = self.get_youtube_client()
+        # self.youtube_client = self.get_youtube_client()
 
     def get_youtube_client(self):
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -70,54 +69,52 @@ class MainApp():
 
             print(self.song_info)
 
-    def get_playlist_id(self):
+    def create_playlist(self):
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
         response = requests.get(
-            url, 
+            url,
             headers = {
                 'Authorization': 'Bearer {}'.format(self.oauth)
             }
         )
 
-        names = [pl['name'] for pl in response.json()['items']]
-        ids = [pl['id'] for pl in response.json()['items']]
+        response_json = response.json()
+        pl_names = [pl['name'] for pl in response_json['items']]
 
-        if not self.playlist_name in names:
+        if not self.playlist_name in pl_names:
             request_body = json.dumps({
                 'name': '{}'.format(self.playlist_name),
                 'description': 'Automated from Youtube',
                 'public': False
             })
 
-            response = requests.post(
+            response2 = requests.post(
                 url, 
                 data = request_body,
                 headers = {
-                    'Content-Type': 'applications/json',
+                    'Content-Type': 'applications.json',
                     'Authorization': 'Bearer {}'.format(self.oauth)
                 }
             )
+        else:
+            print('You already have a playlist for this app.')
 
-        try:
-            return ids[names.index(self.playlist_name)]
-        except ValueError:
-            print('Sorry, there was an error in initializing the playlist. Try reauthenticating your oauth token')
-
-    def get_song_id(self, artist, track):
-        search_url = 'https://api.spotify.com/v1/search?q={}%20{}&type=track'.format(artist, track)
+    def get_playlist_id(self):
+        url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
         response = requests.get(
-            search_url,
+            url,
             headers = {
-                'Content-Type': 'applications/json',
                 'Authorization': 'Bearer {}'.format(self.oauth)
             }
         )
 
         response_json = response.json()
-    
-        return response_json['tracks']['items'][0]['id']
+        pl_names = [pl['name'] for pl in response_json['items']]
+        pl_ids = [pl['id'] for pl in response_json['items']]
+
+        return pl_ids[pl_names.index(self.playlist_name)]
 
     def add_song(self, song_id):
         url = 'https://api.spotify.com/v1/playlists/{}/tracks'.format(self.user_id, self.get_playlist_id())
@@ -138,10 +135,9 @@ class MainApp():
             }
         )
    
-            
-    
 app = MainApp()
-app.store_liked_songs()
+# print(app.get_song_id(('drake'), ('jumpman')))
+print(app.get_playlist_id())
 
 
 # lst = [{'artist': 'Lil Mosey', 'track': 'Blueberry Faygo'}, {'artist': '24kGoldn', 'track': 'Valentino'}, {'artist': 'Roddy Ricch', 'track': 'High Fashion'}]

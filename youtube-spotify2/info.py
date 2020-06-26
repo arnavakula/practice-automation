@@ -1,2 +1,2 @@
 spotify_id = 'arnavakula'
-spotify_playlist = 'Liked videos'
+spotify_playlist = 'Liked yt videos'
