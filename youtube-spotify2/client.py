@@ -18,12 +18,14 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import youtube_dl
 
+
 class MainApp():
 
     def __init__(self):
         self.user_id = info.spotify_id
         self.oauth = info.spotify_oauth
         self.playlist_name = info.spotify_playlist
+        self.song_info = {} #dict where values are a bio-dict
         self.youtube_client = self.get_youtube_client()
 
     def get_youtube_client(self):
@@ -44,7 +46,7 @@ class MainApp():
 
         return youtube_client
 
-    def get_liked_songs_ids(self):
+    def store_liked_songs(self):
         request = self.youtube_client.videos().list(
             part = 'snippet, contentDetails, statistics',
             myRating = 'like'
@@ -52,13 +54,21 @@ class MainApp():
 
         response = request.execute()
         
-        lst = []
         for item in response['items']:
-            artist = item['snippet']['title'].split(' - ')[0]
-            track = item['snippet']['title'].split(' - ')[1].split(' (')[0]
-            lst.append({'artist': artist, 'track': track})
-        
-        return(lst)
+            title = item['snippet']['title']
+            url = 'https://www.youtube.com/watch?v={}'.format(item['id'])
+
+            bio = youtube_dl.YoutubeDL().extract_info(url, download=False)
+            track = bio['track']
+            artist = bio['artist']
+
+            self.song_info[title] = {
+                'url': url,
+                'track': track,
+                'artist': artist
+            }
+
+            print(self.song_info)
 
     def get_playlist_id(self):
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
@@ -106,7 +116,7 @@ class MainApp():
         )
 
         response_json = response.json()
-
+    
         return response_json['tracks']['items'][0]['id']
 
     def add_song(self, song_id):
@@ -131,8 +141,8 @@ class MainApp():
             
     
 app = MainApp()
-print(app.get_liked_songs_ids())
-# app.get_playlist_id()
-# song_id = app.get_song_id('drake', 'jumpman')
-# app.add_song(song_id)
+app.store_liked_songs()
 
+
+# lst = [{'artist': 'Lil Mosey', 'track': 'Blueberry Faygo'}, {'artist': '24kGoldn', 'track': 'Valentino'}, {'artist': 'Roddy Ricch', 'track': 'High Fashion'}]
+# print(lst[0]['artist'])
