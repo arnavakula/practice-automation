@@ -27,7 +27,7 @@ class MainApp():
         self.song_info = {} #dict where values are a bio-dict
         # self.youtube_client = self.get_youtube_client()
 
-    def get_youtube_client(self):
+    def get_youtube_client(self): # called
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
         scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
 
@@ -45,7 +45,7 @@ class MainApp():
 
         return youtube_client
 
-    def store_liked_songs(self):
+    def store_liked_songs(self): # called
         request = self.youtube_client.videos().list(
             part = 'snippet, contentDetails, statistics',
             myRating = 'like'
@@ -67,9 +67,7 @@ class MainApp():
                 'artist': artist
             }
 
-            print(self.song_info)
-
-    def create_playlist(self):
+    def create_playlist(self): # called
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
         response = requests.get(
@@ -100,7 +98,9 @@ class MainApp():
         else:
             print('You already have a playlist for this app.')
 
-    def get_playlist_id(self):
+    def get_playlist_id(self): # called
+        self.create_playlist()
+
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
         response = requests.get(
@@ -116,29 +116,51 @@ class MainApp():
 
         return pl_ids[pl_names.index(self.playlist_name)]
 
-    def add_song(self, song_id):
-        url = 'https://api.spotify.com/v1/playlists/{}/tracks'.format(self.user_id, self.get_playlist_id())
-        print(url)
+    def get_song_id(self, artist, track):
+        search_url = 'https://api.spotify.com/v1/search?q={}%20{}&type=track'.format(artist, track)
 
-        print('spotify:track:{}'.format(song_id))
-
-        request_body = {
-            'uris':['spotify:track:{}'.format(song_id)]
-        }
-        
-        response = requests.post(
-            url, 
-            data = request_body,
+        response = requests.get(
+            search_url,
             headers = {
                 'Content-Type': 'applications/json',
                 'Authorization': 'Bearer {}'.format(self.oauth)
             }
         )
+
+        response_json = response.json()
+    
+        return response_json['tracks']['items'][0]['id']
+
+    def add_song(self):
+        url = 'https://api.spotify.com/v1/playlists/{}/tracks'.format(self.get_playlist_id())
+
+        #self.store_liked_songs()
+
+        song_info = {'Lil Mosey - Blueberry Faygo (Dir. by @_ColeBennett_)': {'url': 'https://www.youtube.com/watch?v=V_jHc_n0p9c', 'track': 'Blueberry Faygo', 'artist': 'Lil Mosey'}, '24kGoldn - Valentino (Official Music Video)': {'url': 'https://www.youtube.com/watch?v=trU-S53fK04', 'track': 'VALENTINO', 'artist': '24kGoldn'}, 'Roddy Ricch - High Fashion (feat. Mustard) [Official Audio]': {'url': 'https://www.youtube.com/watch?v=iGU66wsjIPA', 'track': 'High Fashion (feat. Mustard)', 'artist': 'Roddy Ricch'}}
+
+        song_uris = []
+        for song in song_info:
+            artist = song_info[song]['artist']
+            track = song_info[song]['track']
+            song_uris.append('spotify:track:{}'.format(self.get_song_id(artist, track)))
+        
+        print(song_uris)
+
+        request_body = json.dumps(song_uris)
+
+        response = requests.post(
+            url,
+            data = request_body,
+            headers = {
+               'Authorization': 'Bearer {}'.format(self.oauth),
+               'Content-Type': 'applications/json'
+            }
+       )
+
    
 app = MainApp()
-# print(app.get_song_id(('drake'), ('jumpman')))
-print(app.get_playlist_id())
 
+app.add_song()
 
 # lst = [{'artist': 'Lil Mosey', 'track': 'Blueberry Faygo'}, {'artist': '24kGoldn', 'track': 'Valentino'}, {'artist': 'Roddy Ricch', 'track': 'High Fashion'}]
 # print(lst[0]['artist'])
