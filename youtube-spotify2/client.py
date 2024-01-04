@@ -15,8 +15,8 @@ import os
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
-import googleapiclient.errors
 import youtube_dl
+from security import safe_requests
 
 class MainApp():
 
@@ -70,8 +70,7 @@ class MainApp():
     def create_playlist(self): # called
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
-        response = requests.get(
-            url,
+        response = safe_requests.get(url,
             headers = {
                 'Authorization': 'Bearer {}'.format(self.oauth)
             }
@@ -103,8 +102,7 @@ class MainApp():
 
         url = 'https://api.spotify.com/v1/users/{}/playlists'.format(self.user_id)
 
-        response = requests.get(
-            url,
+        response = safe_requests.get(url,
             headers = {
                 'Authorization': 'Bearer {}'.format(self.oauth)
             }
@@ -119,8 +117,7 @@ class MainApp():
     def get_song_id(self, artist, track): # called
         search_url = 'https://api.spotify.com/v1/search?q={}%20{}&type=track'.format(artist, track)
 
-        response = requests.get(
-            search_url,
+        response = safe_requests.get(search_url,
             headers = {
                 'Content-Type': 'applications/json',
                 'Authorization': 'Bearer {}'.format(self.oauth)
