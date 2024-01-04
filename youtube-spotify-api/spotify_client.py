@@ -1,5 +1,6 @@
 import requests
 import urllib.parse
+from security import safe_requests
 
 class SpotifyClient(object):
     def __init__(self, oauth):
@@ -8,8 +9,7 @@ class SpotifyClient(object):
     def search_song(self, artist, track):
         query = urllib.parse.quote(f'{artist} {track}')
         url = f'https://api.spotify.com/v1/search?q={query}&type=track'
-        response = requests.get(
-            url,
+        response = safe_requests.get(url,
             headers = {
                 'Content-Type': 'applications/json',
                 'Authorization': f'Bearer {self.oauth}'
